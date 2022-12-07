@@ -14,7 +14,7 @@ services:
       - db
     restart: on-failure
     volumes:
-      - .:/app  
+      - .:/code  
   db:
     image: postgres
     volumes:
@@ -46,7 +46,7 @@ services:
       - redisdata:/data
   celery:
     build: .
-    command: celery -A immigo_news worker --loglevel=info
+    command: celery -A news_site worker --loglevel=info
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: 123456
@@ -56,7 +56,16 @@ services:
       - db
       - web
     volumes:
-      - .:/app
+      - .:/code
+  tests:
+    build: .
+    command: pytest
+    depends_on:
+      - redis
+      - db
+    tty: true
+    volumes:
+      - .:/code
 
 volumes:
   redisdata:    
