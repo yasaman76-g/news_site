@@ -10,6 +10,8 @@ requests = "*"
 celery = "*"
 redis = "*"
 psycopg2 = "*"
+pytest = "*"
+pytest-django = "*"
 
 [dev-packages]
 autopep8 = "*"

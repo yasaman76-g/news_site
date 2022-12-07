@@ -1,6 +1,8 @@
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
 from django.core.files import File
+from rest_framework import status
+from rest_framework.response import Response
 from celery import shared_task
 from tags.models import Tag, TaggedItem
 from .models import News, Author, Attachments
@@ -13,6 +15,7 @@ def store_news(news_data):
     with transaction.atomic():
         
         for item in news_data:
+            author = ""
             if "author" in item:
                 author = Author.objects.create(
                     name=item["author"].get("name",""),
@@ -20,15 +23,19 @@ def store_news(news_data):
                     avatar=item["author"].get("avatar",""),
                 )
             
-            news = News.objects.create(
+            news = News(
                 url=item["url"],
                 title=item["title"],
                 content_html=item["content_html"],
                 summary=item["summary"],
                 image=item["image"],
-                date_published=item["date_published"],
-                author=author
+                date_published=item["date_published"]
             )
+            
+            if author != "":
+                news.author = author
+                
+            news.save()
             
             if "attachments" in item:
                 for attachment in item["attachments"]:
@@ -59,6 +66,12 @@ def store_news(news_data):
                         object_id=news.id,
                         content_object=news
                     )
+         
+        content = {'message': 'created successfuly'}           
+        return Response(content, status=status.HTTP_201_CREATED)
+    
+    content = {'message': 'bad request'}  
+    return Response(content, status=status.HTTP_400_BAD_REQUEST)
                 
                 
 
