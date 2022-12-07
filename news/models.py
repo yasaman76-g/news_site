@@ -7,7 +7,7 @@ class Author(models.Model):
     avatar = models.CharField(max_length=255,null=True,blank=True)
     
     def __str__(self):
-        return self.title
+        return self.name
     
     
 class News(models.Model):
@@ -21,6 +21,11 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        verbose_name = "news"
+        verbose_name_plural = "news"
+        
  
     
 class Attachments(models.Model):

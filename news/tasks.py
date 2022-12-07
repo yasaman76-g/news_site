@@ -13,11 +13,12 @@ def store_news(news_data):
     with transaction.atomic():
         
         for item in news_data:
-            author = Author.objects.create(
-                name=item["author"].get("name",""),
-                url=item["author"].get("url",""),
-                avatar=item["author"].get("avatar",""),
-            )
+            if "author" in item:
+                author = Author.objects.create(
+                    name=item["author"].get("name",""),
+                    url=item["author"].get("url",""),
+                    avatar=item["author"].get("avatar",""),
+                )
             
             news = News.objects.create(
                 url=item["url"],
@@ -32,6 +33,7 @@ def store_news(news_data):
             if "attachments" in item:
                 for attachment in item["attachments"]:
                     attachments = Attachments.objects.create(
+                        url=attachment["url"],
                         mime_type=attachment["mime_type"],
                         title=attachment["title"],
                         duration_in_seconds=attachment["duration_in_seconds"],
